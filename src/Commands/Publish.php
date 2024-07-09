@@ -55,7 +55,7 @@ class Publish extends BaseCommand
     {
         // TODO: Implement run() method.
 
-        $publisher = new Publisher( VENDORPATH . 'test/local', ROOTPATH);
+        $publisher = new Publisher( VENDORPATH . 'pipo/raft/local', ROOTPATH);
 
         try {
 
