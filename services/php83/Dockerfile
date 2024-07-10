@@ -112,10 +112,11 @@ RUN npm install -g yarn
 
 
 RUN groupadd --force -g $WWWGROUP raft
-RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1000 raft
+RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 raft
+
 # Set permissions for the 'raft' user
-RUN chown -R raft:raft /var/www/html
-RUN chown -R www-data:www-data /var/www/html/writeable
+#RUN chown -R raft:raft /var/www/html
+#RUN chown -R www-data:www-data /var/www/html/writeable
 
 USER raft
 
