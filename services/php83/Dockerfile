@@ -4,7 +4,8 @@ FROM php:8.3-apache-bookworm
 # https://github.com/moby/moby/issues/4032#issuecomment-192327844
  
 ARG DEBIAN_FRONTEND=noninteractive
-ARG WWWGROUP
+# Set a default value for WWWGROUP
+ARG WWWGROUP=1000
 
 # Update
 RUN apt-get -y update --fix-missing && \
@@ -106,8 +107,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
 # Install Yarn
 RUN npm install -g yarn
 
-RUN groupadd --force -g $WWWGROUP raft
-RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 raft
+# Create the 'raft' group and user
+RUN groupadd --force -g ${WWWGROUP:-1000} raft && \
+    useradd -ms /bin/bash --no-user-group -g raft -u 1337 raft
 
 # Cleanup
 RUN rm -rf /usr/src/*
