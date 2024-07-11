@@ -109,7 +109,8 @@ RUN npm install -g yarn
 
 # Create the 'raft' group and user
 RUN groupadd --force -g ${WWWGROUP:-1000} raft && \
-    useradd -ms /bin/bash --no-user-group -g raft -u 1337 raft
+    useradd -ms /bin/bash --no-user-group -g raft -u 1000 raft && \
+    usermod -aG www-data raft
 
 # Cleanup
 RUN rm -rf /usr/src/*
