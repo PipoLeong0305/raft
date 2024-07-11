@@ -5,11 +5,6 @@ FROM php:8.3-apache-bookworm
  
 ARG DEBIAN_FRONTEND=noninteractive
 
-ARG WWWGROUP
-ARG NODE_VERSION=20
-ARG MYSQL_CLIENT="mysql-client"
-ARG POSTGRES_VERSION=15
-
 # Update
 RUN apt-get -y update --fix-missing && \
     apt-get upgrade -y && \
@@ -109,16 +104,5 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
 
 # Install Yarn
 RUN npm install -g yarn
-
-
-RUN groupadd --force -g $WWWGROUP raft
-RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 raft
-
-# Set permissions for the 'raft' user
-#RUN chown -R raft:raft /var/www/html
-#RUN chown -R www-data:www-data /var/www/html/writeable
-
-USER raft
-
 # Cleanup
 RUN rm -rf /usr/src/*
