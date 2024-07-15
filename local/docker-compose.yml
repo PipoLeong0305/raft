@@ -19,6 +19,7 @@ services:
       - ${VHOSTS_DIR-./docker/config/vhosts}:/etc/apache2/sites-enabled
       - ${LOG_DIR-./docker/logs/apache2}:/var/log/apache2
       - ${XDEBUG_LOG_DIR-./docker/logs/xdebug}:/var/log/xdebug
+      - ./writable:/var/www/html/writable:rw
     environment:
       APACHE_DOCUMENT_ROOT: ${APACHE_DOCUMENT_ROOT-/var/www/html/public}
       PMA_PORT: ${HOST_MACHINE_PMA_PORT-:8080}
