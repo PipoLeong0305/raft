@@ -25,6 +25,7 @@ RUN sed -i \
 
 # Enable necessary Apache modules
 RUN sed -i \
+-e 's/^#\(Include .*httpd-vhosts.conf\)/\1/' \
 -e '/#LoadModule ssl_module/s/^#//g' \
 -e '/#LoadModule socache_shmcb_module/s/^#//g' \
 -e '/#LoadModule http2_module/s/^#//g' \
