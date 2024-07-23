@@ -3,8 +3,13 @@ services:
   php-fpm:
     build:
       context: "./vendor/pipo/raft/services/php83"
+      Dockerfile: Dockerfile
+      args:
+        WWWGROUP: '${WWWGROUP}'
     volumes:
       - ./:/var/www/html:rw
+    environment:
+      WWWUSER: '${WWWUSER}'
     ports:
       - "5173:5173"
     networks:
@@ -13,12 +18,17 @@ services:
   apache-httpd:
     build:
       context: "./vendor/pipo/raft/services/apache"
+      Dockerfile: Dockerfile
+      args:
+        WWWGROUP: '${WWWGROUP}'
     volumes:
       - ./:/var/www/html:rw
       - ./docker/apache/ssl:/usr/local/apache2/ssl
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      WWWUSER: '${WWWUSER}'
     depends_on:
       - php-fpm
     networks:
