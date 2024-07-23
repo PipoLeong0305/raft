@@ -24,6 +24,7 @@ services:
     volumes:
       - ./:/var/www/html:rw
       - ./docker/apache/ssl:/usr/local/apache2/ssl
+      - ./docker/apache/conf/extra:/usr/local/apache2/conf/extra
     ports:
       - "80:80"
       - "443:443"
