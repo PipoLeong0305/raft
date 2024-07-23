@@ -3,7 +3,7 @@ services:
   php-fpm:
     build:
       context: "./vendor/pipo/raft/services/php83"
-      Dockerfile: Dockerfile
+      dockerfile: Dockerfile
       args:
         WWWGROUP: '${WWWGROUP}'
     volumes:
@@ -18,7 +18,7 @@ services:
   apache-httpd:
     build:
       context: "./vendor/pipo/raft/services/apache"
-      Dockerfile: Dockerfile
+      dockerfile: Dockerfile
       args:
         WWWGROUP: '${WWWGROUP}'
     volumes:
