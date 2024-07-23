@@ -1,97 +1,29 @@
-version: "3"
-
+version: '3.9'
 services:
-  webserver:
+  php-fpm:
     build:
-      context: "./vendor/pipo/raft/services/${PHPVERSION-php83}"
-    container_name: "${APP_NAME-codeigniter.test}-${PHPVERSION-php83}"
-    restart: "always"
-    ports:
-      - "${HOST_MACHINE_UNSECURE_HOST_PORT-:80}:80"
-      - "${HOST_MACHINE_SECURE_HOST_PORT-:443}:443"
-      - "${HOST_MACHINE_VITE_PORT-:5173}:5173"
-    links:
-      - database
+      context: "./vendor/pipo/raft/services/php83"
     volumes:
-      - ${DOCUMENT_ROOT-./}:/var/www/html:rw
-      - ${PHP_INI-./docker/config/php/php.ini}:/usr/local/etc/php/php.ini
-      - ${SSL_DIR-./docker/config/ssl}:/etc/apache2/ssl/
-      - ${VHOSTS_DIR-./docker/config/vhosts}:/etc/apache2/sites-enabled
-      - ${LOG_DIR-./docker/logs/apache2}:/var/log/apache2
-      - ${XDEBUG_LOG_DIR-./docker/logs/xdebug}:/var/log/xdebug
-      - ./writable:/var/www/html/writable:rw
-    environment:
-      APACHE_DOCUMENT_ROOT: ${APACHE_DOCUMENT_ROOT-/var/www/html/public}
-      PMA_PORT: ${HOST_MACHINE_PMA_PORT-:8080}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      HOST_MACHINE_MYSQL_PORT: ${HOST_MACHINE_MYSQL_PORT-:3306}
-      XDEBUG_CONFIG: "client_host=host.docker.internal remote_port=${XDEBUG_PORT-:9003}"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - ./:/var/www/html:rw
+    ports:
+      - "5173:5173"
     networks:
       - raft
+  
+  apache-httpd:
+    build:
+      context: "./vendor/pipo/raft/services/apache"
+    volumes:
+      - ./:/var/www/html:rw
+      - ./docker/apache/ssl:/usr/local/apache2/ssl
+    ports:
+      - "80:80"
+      - "443:443"
     depends_on:
-      - database
-      - phpmyadmin
-      - redis
-  database:
-    build:
-      context: "./vendor/pipo/raft/services/${DATABASE-mysql8}"
-    container_name: "${APP_NAME-codeigniter.test}-${DATABASE-mysql8}"
-    restart: "always"
-    ports:
-      - "127.0.0.1:${HOST_MACHINE_MYSQL_PORT-3306}:3306"
-    volumes:
-      - ${MYSQL_INITDB_DIR-./docker/config/initdb}:/docker-entrypoint-initdb.d
-      - ${MYSQL_DATA_DIR-./docker/data/mysql}:/var/lib/mysql
-      - ${MYSQL_LOG_DIR-./docker/logs/mysql}:/var/log/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    networks:
-      - raft
-  phpmyadmin:
-    image: phpmyadmin
-    container_name: "${APP_NAME-codeigniter.test}-phpmyadmin"
-    links:
-      - database
-    environment:
-      PMA_HOST: database
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      UPLOAD_LIMIT: ${UPLOAD_LIMIT-512M}
-      MEMORY_LIMIT: ${MEMORY_LIMIT-512M}
-    ports:
-      - "${HOST_MACHINE_PMA_PORT-:8080}:80"
-      - "${HOST_MACHINE_PMA_SECURE_PORT-:8443}:443"
-    volumes:
-      - /sessions
-      - ${PHP_INI-./docker/config/php/php.ini}:/usr/local/etc/php/conf.d/php-phpmyadmin.ini
-    networks:
-      - raft
-  redis:
-    container_name: "${APP_NAME-codeigniter.test}-redis"
-    image: redis:latest
-    ports:
-      - "127.0.0.1:${HOST_MACHINE_REDIS_PORT-6379}:6379"
+      - php-fpm
     networks:
       - raft
 
 networks:
   raft:
     driver: bridge
-
-volumes:
-  raft-mysql:
-    driver: local
-  raft-redis:
-    driver: local
