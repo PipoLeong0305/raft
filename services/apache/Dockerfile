@@ -21,7 +21,7 @@ RUN sed -i \
 /usr/local/apache2/conf/httpd.conf
 
 # Copy the Apache virtual host configuration file to the container
-COPY ./apache/conf/extra /usr/local/apache2/conf/extra
+COPY ./docker/apache/conf/extra /usr/local/apache2/conf/extra
 
 # Enable necessary Apache modules
 RUN sed -i \
