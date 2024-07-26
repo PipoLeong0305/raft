@@ -26,20 +26,10 @@ RUN sed -i \
 # Enable necessary Apache modules
 RUN sed -i \
 -e 's/^#\(Include .*httpd-vhosts.conf\)/\1/' \
--e '/#LoadModule ssl_module/s/^#//g' \
 -e '/#LoadModule socache_shmcb_module/s/^#//g' \
--e '/#LoadModule http2_module/s/^#//g' \
 -e '/#LoadModule deflate_module/s/^#//g' \
 -e '/#LoadModule proxy_module/s/^#//g' \
 -e '/#LoadModule proxy_fcgi_module/s/^#//g' \
 -e '/#LoadModule rewrite_module/s/^#//g' \
 -e '/#LoadModule headers_module/s/^#//g' \
-/usr/local/apache2/conf/httpd.conf
-
-# Enable SSL configuration
-RUN sed -i \
--e 's/^#\(Include .*httpd-ssl.conf\)/\1/' \
--e 's/^#\(LoadModule ssl_module .*\)/\1/' \
--e 's/^#\(LoadModule socache_shmcb_module .*\)/\1/' \
--e 's/^#\(LoadModule http2_module .*\)/\1/' \
 /usr/local/apache2/conf/httpd.conf
