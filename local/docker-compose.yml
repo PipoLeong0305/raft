@@ -8,6 +8,8 @@ services:
         WWWGROUP: '${WWWGROUP}'
     volumes:
       - ./:/var/www/html:rw
+    links:
+      - database
     environment:
       WWWUSER: '${WWWUSER}'
     ports:
@@ -23,17 +25,55 @@ services:
         WWWGROUP: '${WWWGROUP}'
     volumes:
       - ./:/var/www/html:rw
-      - ./docker/apache/ssl:/usr/local/apache2/ssl
       - ./docker/apache/conf/extra:/usr/local/apache2/conf/extra
     ports:
       - "80:80"
       - "443:443"
     environment:
       WWWUSER: '${WWWUSER}'
+    links:
+      - database
     depends_on:
       - php-fpm
     networks:
       - raft
+  
+  database:
+    build:
+      context: "./vendor/pipo/raft/services/mysql8"
+      dockerfile: Dockerfile
+    restart: "always"
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - ./docker/data/mysql:/var/lib/mysql
+      - ./dockerlogs/mysql:/var/log/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_codeigniter
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+  phpmyadmin:
+    image: phpmyadmin
+    links:
+      - database
+    environment:
+      PMA_HOST: database
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      UPLOAD_LIMIT: 512M
+      MEMORY_LIMIT: 512M
+    ports:
+      - "8080:80"
+      - "8443:443"
+  redis:
+    image: redis:latest
+    ports:
+      - "127.0.0.1:6379:6379"
 
 networks:
   raft:
