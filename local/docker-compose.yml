@@ -6,6 +6,7 @@ services:
       dockerfile: Dockerfile
       args:
         WWWGROUP: '${WWWGROUP}'
+    container_name: "${APP_NAME}-php-fpm"
     volumes:
       - ./:/var/www/html:rw
     links:
@@ -16,19 +17,18 @@ services:
       - "5173:5173"
     networks:
       - raft
-  
   apache-httpd:
     build:
       context: "./vendor/pipo/raft/services/apache"
       dockerfile: Dockerfile
       args:
         WWWGROUP: '${WWWGROUP}'
+    container_name: "${APP_NAME}-webserver"
     volumes:
       - ./:/var/www/html:rw
       - ./docker/apache/conf/extra:/usr/local/apache2/conf/extra
     ports:
-      - "80:80"
-      - "443:443"
+      - "${APP_UNSECURE_HOST_PORT}:80"
     environment:
       WWWUSER: '${WWWUSER}'
     links:
@@ -37,43 +37,49 @@ services:
       - php-fpm
     networks:
       - raft
-  
   database:
     build:
       context: "./vendor/pipo/raft/services/mysql8"
       dockerfile: Dockerfile
+    container_name: "${APP_NAME}-database"
     restart: "always"
     ports:
-      - "127.0.0.1:3306:3306"
+      - "127.0.0.1:{$database_default_port-3306}:3306"
     volumes:
       - ./docker/data/mysql:/var/lib/mysql
-      - ./dockerlogs/mysql:/var/log/mysql
+      - ./docker/logs/mysql:/var/log/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: db_codeigniter
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${database_default_database-db_codeigniter}
+      MYSQL_USER: ${database_default_username}
+      MYSQL_PASSWORD: ${database_default_password}
   phpmyadmin:
     image: phpmyadmin
+    container_name: "${APP_NAME}-phpmyadmin"
     links:
       - database
     environment:
       PMA_HOST: database
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: root
+      PMA_PORT: {$database_default_port}
+      PMA_USER: ${DATABASE_ROOT_USERNAME-root}
+      PMA_PASSWORD: ${DATABASE_ROOT_PASSWORD}
       MYSQL_ROOT_PASSWORD: root${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin
-      UPLOAD_LIMIT: 512M
-      MEMORY_LIMIT: 512M
+      MYSQL_USER: ${database_default_username}
+      MYSQL_PASSWORD: ${database_default_password}
+      UPLOAD_LIMIT: ${UPLOAD_LIMIT}
+      MEMORY_LIMIT: ${MEMORY_LIMIT}
     ports:
-      - "8080:80"
-      - "8443:443"
+      - "${PMA_PORT}:80"
+      - "${PMA_SECURE_PORT}:443"
+    networks:
+      - raft
   redis:
     image: redis:latest
+    container_name: "${APP_NAME}-redis"
     ports:
-      - "127.0.0.1:6379:6379"
+      - "127.0.0.1:${REDIS_PORT}:6379"
+    networks:
+      - raft
 
 networks:
   raft:
