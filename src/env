@@ -14,46 +14,46 @@
 # ENVIRONMENT
 #--------------------------------------------------------------------
 
-CI_ENVIRONMENT = development
+CI_ENVIRONMENT=development
 
 #--------------------------------------------------------------------
 # APP
 #--------------------------------------------------------------------
 
-APP_NAME = CodeIgniter
+APP_NAME=CodeIgniter
 
-app_baseURL = 'http://localhost'
+app_baseURL='http://localhost'
 # If you have trouble with `.`, you could also use `_`.
-# app_baseURL = ''
-# app_forceGlobalSecureRequests = false
-# app_CSPEnabled = false
+# app_baseURL=''
+# app_forceGlobalSecureRequests=false
+# app_CSPEnabled=false
 
 #--------------------------------------------------------------------
 # DATABASE
 #--------------------------------------------------------------------
 
 
-DATABASE_ROOT_USERNAME  = root
-DATABASE_ROOT_PASSWORD  = root
+DATABASE_ROOT_USERNAME =root
+DATABASE_ROOT_PASSWORD =root
 
-database_default_hostname = host.docker.internal
-database_default_database = db_codeigniter
-database_default_username = root
-database_default_password = root
-database_default_DBDriver = MySQLi
+database_default_hostname=host.docker.internal
+database_default_database=db_codeigniter
+database_default_username=root
+database_default_password=root
+database_default_DBDriver=MySQLi
 database_default_DBPrefix =
-database_default_port = 3306
+database_default_port=3306
 
 # If you use MySQLi as tests, first update the values of Config\Database::$tests.
-# database_tests_hostname = localhost
-# database_tests_database = ci4_test
-# database_tests_username = root
-# database_tests_password = root
-# database_tests_DBDriver = MySQLi
+# database_tests_hostname=localhost
+# database_tests_database=ci4_test
+# database_tests_username=root
+# database_tests_password=root
+# database_tests_DBDriver=MySQLi
 # database_tests_DBPrefix =
-# database_tests_charset = utf8mb4
-# database_tests_DBCollat = utf8mb4_general_ci
-# database_tests_port = 3306
+# database_tests_charset=utf8mb4
+# database_tests_DBCollat=utf8mb4_general_ci
+# database_tests_port=3306
 
 #--------------------------------------------------------------------
 # ENCRYPTION
@@ -65,30 +65,30 @@ database_default_port = 3306
 # SESSION
 #--------------------------------------------------------------------
 
-# session_driver = 'CodeIgniter\Session\Handlers\FileHandler'
-# session.savePath = null
+# session_driver='CodeIgniter\Session\Handlers\FileHandler'
+# session.savePath=null
 
 #--------------------------------------------------------------------
 # LOGGER
 #--------------------------------------------------------------------
 
-# logger_threshold = 4
+# logger_threshold=4
 
 
 #--------------------------------------------------------------------
 # PHPMYADMIN
 #--------------------------------------------------------------------
 
-PMA_PORT        = 8080
-PMA_SECURE_PORT = 8443
-UPLOAD_LIMIT    = 512M
-MEMORY_LIMIT    = 512M
+PMA_PORT       =8080
+PMA_SECURE_PORT=8443
+UPLOAD_LIMIT   =512M
+MEMORY_LIMIT   =512M
 
 #--------------------------------------------------------------------
 # REDIS
 #--------------------------------------------------------------------
 
-REDIS_PORT = 6379
+REDIS_PORT=6379
 
 
 #--------------------------------------------------------------------
