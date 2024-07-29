@@ -33,15 +33,15 @@ app_baseURL='http://localhost'
 #--------------------------------------------------------------------
 
 
-DATABASE_ROOT_USERNAME =root
-DATABASE_ROOT_PASSWORD =root
+DATABASE_ROOT_USERNAME=root
+DATABASE_ROOT_PASSWORD=root
 
 database_default_hostname=host.docker.internal
 database_default_database=db_codeigniter
 database_default_username=root
 database_default_password=root
 database_default_DBDriver=MySQLi
-database_default_DBPrefix =
+database_default_DBPrefix=
 database_default_port=3306
 
 # If you use MySQLi as tests, first update the values of Config\Database::$tests.
@@ -79,10 +79,10 @@ database_default_port=3306
 # PHPMYADMIN
 #--------------------------------------------------------------------
 
-PMA_PORT       =8080
+PMA_PORT=8080
 PMA_SECURE_PORT=8443
-UPLOAD_LIMIT   =512M
-MEMORY_LIMIT   =512M
+UPLOAD_LIMIT=512M
+MEMORY_LIMIT=512M
 
 #--------------------------------------------------------------------
 # REDIS
