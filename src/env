@@ -1,0 +1,98 @@
+#--------------------------------------------------------------------
+# Example Environment Configuration file
+#
+# This file can be used as a starting point for your own
+# custom .env files, and contains most of the possible settings
+# available in a default install.
+#
+# By default, all of the settings are commented out. If you want
+# to override the setting, you must un-comment it by removing the '#'
+# at the beginning of the line.
+#--------------------------------------------------------------------
+
+#--------------------------------------------------------------------
+# ENVIRONMENT
+#--------------------------------------------------------------------
+
+CI_ENVIRONMENT = development
+
+#--------------------------------------------------------------------
+# APP
+#--------------------------------------------------------------------
+
+APP_NAME = CodeIgniter
+
+app_baseURL = 'http://localhost'
+# If you have trouble with `.`, you could also use `_`.
+# app_baseURL = ''
+# app_forceGlobalSecureRequests = false
+# app_CSPEnabled = false
+
+#--------------------------------------------------------------------
+# DATABASE
+#--------------------------------------------------------------------
+
+
+DATABASE_ROOT_USERNAME  = root
+DATABASE_ROOT_PASSWORD  = root
+
+database_default_hostname = host.docker.internal
+database_default_database = db_codeigniter
+database_default_username = root
+database_default_password = root
+database_default_DBDriver = MySQLi
+database_default_DBPrefix =
+database_default_port = 3306
+
+# If you use MySQLi as tests, first update the values of Config\Database::$tests.
+# database_tests_hostname = localhost
+# database_tests_database = ci4_test
+# database_tests_username = root
+# database_tests_password = root
+# database_tests_DBDriver = MySQLi
+# database_tests_DBPrefix =
+# database_tests_charset = utf8mb4
+# database_tests_DBCollat = utf8mb4_general_ci
+# database_tests_port = 3306
+
+#--------------------------------------------------------------------
+# ENCRYPTION
+#--------------------------------------------------------------------
+
+# encryption_key =
+
+#--------------------------------------------------------------------
+# SESSION
+#--------------------------------------------------------------------
+
+# session_driver = 'CodeIgniter\Session\Handlers\FileHandler'
+# session.savePath = null
+
+#--------------------------------------------------------------------
+# LOGGER
+#--------------------------------------------------------------------
+
+# logger_threshold = 4
+
+
+#--------------------------------------------------------------------
+# PHPMYADMIN
+#--------------------------------------------------------------------
+
+PMA_PORT        = 8080
+PMA_SECURE_PORT = 8443
+UPLOAD_LIMIT    = 512M
+MEMORY_LIMIT    = 512M
+
+#--------------------------------------------------------------------
+# REDIS
+#--------------------------------------------------------------------
+
+REDIS_PORT = 6379
+
+
+#--------------------------------------------------------------------
+# OTHERS
+#--------------------------------------------------------------------
+
+APP_UNSECURE_HOST_PORT=80

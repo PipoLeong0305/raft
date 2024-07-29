@@ -55,12 +55,22 @@ class Publish extends BaseCommand
     {
         // TODO: Implement run() method.
 
-        $publisher = new Publisher( VENDORPATH . 'pipo/raft/local', ROOTPATH);
+        $source     = service('autoloader')->getNamespace('Pipo\\Raft')[0];
+        $publisher  = new Publisher( VENDORPATH . 'pipo/raft/local', ROOTPATH);
 
         try {
 
             $publisher->publish();
 
+            // Check if .env file exists
+            if (!file_exists(ROOTPATH . '.env')) {
+                // If .env doesn't exist, copy env to .env
+                copy(source . 'env', ROOTPATH . '.env');
+            }
+                
+            $publisher = new Publisher($source, APPPATH);
+
+            
         } catch (Throwable $e) {
 
             $this->showError($e);
