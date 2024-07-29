@@ -79,10 +79,10 @@ database_default_port=3306
 # PHPMYADMIN
 #--------------------------------------------------------------------
 
-PMA_PORT=8080
-PMA_SECURE_PORT=8443
-UPLOAD_LIMIT=512M
-MEMORY_LIMIT=512M
+PMA_PORT="8080"
+PMA_SECURE_PORT="8443"
+UPLOAD_LIMIT="512M"
+MEMORY_LIMIT="512M"
 
 #--------------------------------------------------------------------
 # REDIS

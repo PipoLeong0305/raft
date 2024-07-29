@@ -44,7 +44,7 @@ services:
     container_name: "${APP_NAME}-database"
     restart: "always"
     ports:
-      - "127.0.0.1:{$database_default_port-3306}:3306"
+      - "127.0.0.1:${database_default_port-3306}:3306"
     volumes:
       - ./docker/data/mysql:/var/lib/mysql
       - ./docker/logs/mysql:/var/log/mysql
@@ -60,7 +60,7 @@ services:
       - database
     environment:
       PMA_HOST: database
-      PMA_PORT: {$database_default_port}
+      PMA_PORT: ${database_default_port}
       PMA_USER: ${DATABASE_ROOT_USERNAME-root}
       PMA_PASSWORD: ${DATABASE_ROOT_PASSWORD}
       MYSQL_ROOT_PASSWORD: root${DATABASE_ROOT_PASSWORD}
