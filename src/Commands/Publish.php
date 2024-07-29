@@ -65,7 +65,7 @@ class Publish extends BaseCommand
             // Check if .env file exists
             if (!file_exists(ROOTPATH . '.env')) {
                 // If .env doesn't exist, copy env to .env
-                copy(source . 'env', ROOTPATH . '.env');
+                copy($source . 'env', ROOTPATH . '.env');
             }
                 
             $publisher = new Publisher($source, APPPATH);
