@@ -38,8 +38,8 @@ DATABASE_ROOT_PASSWORD=root
 
 database_default_hostname=host.docker.internal
 database_default_database=db_codeigniter
-database_default_username=root
-database_default_password=root
+database_default_username=admin
+database_default_password=admin
 database_default_DBDriver=MySQLi
 database_default_DBPrefix=
 database_default_port=3306
