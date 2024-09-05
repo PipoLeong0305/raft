@@ -76,5 +76,8 @@ class Publish extends BaseCommand
             $this->showError($e);
 
         }
+
+        // Show success message
+        CLI::write('Raft published successfully.', 'green');
     }
 }
