@@ -1,0 +1,63 @@
+services:
+  codeigniter:
+    build:
+      context: "./vendor/codeigniter/raft/runtimes/8.2"
+      dockerfile: Dockerfile
+      args:
+        - WWWGROUP=${WWWGROUP:-1000}
+    container_name: "${APP-NAME}/app"
+    volumes:
+      - ./:/var/www/html:rw
+    environment:
+      - WWWUSER=${WWWUSER:-1000}
+      - WWWGROUP=${WWWGROUP:-1000}
+    ports:
+      - "80:80"
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql:8
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: codeigniter
+      MYSQL_USER: codeigniter
+      MYSQL_PASSWORD: secret
+    networks:
+      - app-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: root
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  app-network:
+    driver: bridge
