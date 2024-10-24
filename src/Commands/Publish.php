@@ -9,7 +9,6 @@ use Throwable;
 
 class Publish extends BaseCommand
 {
-
     /**
      * The Command's Group
      *
@@ -66,6 +65,7 @@ class Publish extends BaseCommand
                 ->merge(false); // Be careful not to overwrite anything
         } catch (Throwable $e) {
             $this->showError($e);
+
             return;
         }
 
