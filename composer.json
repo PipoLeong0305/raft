@@ -29,6 +29,9 @@
             "phpstan/extension-installer": true
         }
     },
+    "bin": [
+        "bin/raft"
+    ],
     "scripts": {
         "cs-fix": "php-cs-fixer fix --ansi --verbose --diff"
     }
