@@ -3,6 +3,7 @@
 namespace Pipo\Raft\Commands;
 
 use CodeIgniter\CLI\BaseCommand;
+use CodeIgniter\CLI\CLI;
 use CodeIgniter\Publisher\Publisher;
 use Throwable;
 
@@ -61,18 +62,10 @@ class Publish extends BaseCommand
         $publisher  = new Publisher( $source, ROOTPATH);
 
         try {
-            $publisher->addFile('docker-compose.yml');
 
-            $publisher->copy();
-//            $publisher->publish();
-
-            // Check if .env file exists
-//            if (!file_exists(ROOTPATH . '.env')) {
-//                // If .env doesn't exist, copy env to .env
-//                copy($source . 'env', ROOTPATH . '.env');
-//            }
-//
-//            $publisher = new Publisher($source, APPPATH);
+            // Add only the docker-compose.yml file
+            $publisher->addPath('docker-compose.yml')
+                ->merge(false); // Be careful not to overwrite anything
 
             
         } catch (Throwable $e) {
