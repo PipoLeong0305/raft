@@ -56,9 +56,9 @@ class Publish extends BaseCommand
         // TODO: Implement run() method.
 
 
-
-        $source     = service('autoloader')->getNamespace('Pipo\\Raft')[0];
-        $publisher  = new Publisher( VENDORPATH . 'pipo/raft/local', ROOTPATH);
+        // Use the Autoloader to figure out the module path
+        $source = service('autoloader')->getNamespace('Pipo\\Raft')[0];
+        $publisher  = new Publisher( $source, ROOTPATH);
 
         try {
             $publisher->addFile('docker-compose.yml');
