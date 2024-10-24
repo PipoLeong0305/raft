@@ -29,7 +29,7 @@ class Publish extends BaseCommand
      *
      * @var string
      */
-    protected $description = '';
+    protected $description = 'Publish Raft docker-compose.yml into the application root.';
 
     /**
      * The Command's Usage
@@ -54,27 +54,27 @@ class Publish extends BaseCommand
 
     public function run(array $params)
     {
-        // TODO: Implement run() method.
-
-
         // Use the Autoloader to figure out the module path
         $source = service('autoloader')->getNamespace('Pipo\\Raft')[0];
-        $publisher  = new Publisher( $source, ROOTPATH);
+
+        // For docker-compose.yml, we want to publish to ROOTPATH instead of APPPATH
+        $publisher = new Publisher($source, ROOTPATH);
 
         try {
-
             // Add only the docker-compose.yml file
             $publisher->addPath('docker-compose.yml')
                 ->merge(false); // Be careful not to overwrite anything
-
-            
         } catch (Throwable $e) {
-
             $this->showError($e);
-
+            return;
         }
 
-        // Show success message
-        CLI::write('Raft published successfully.', 'green');
+        // Success message if we get here
+        $this->write('Published docker-compose.yml to project root', 'green');
+    }
+
+    private function write(string $message, string $color = 'white'): void
+    {
+        CLI::write("[Raft Publisher] {$message}", $color);
     }
 }
