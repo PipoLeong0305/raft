@@ -1,0 +1,267 @@
+#!/usr/bin/env bash
+
+# CodeIgniter Raft - A Docker-based development environment for CodeIgniter 4
+# Inspired by Laravel Sail
+
+# Define colors for CLI output
+BOLD='\033[1m'
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+RESET='\033[0m'
+
+# Default environment variables
+export APP_PORT=${APP_PORT:-80}
+export APP_SERVICE=${APP_SERVICE:-raft-app}
+export DB_PORT=${DB_PORT:-3306}
+export WWWUSER=${WWWUSER:-$UID}
+export WWWGROUP=${WWWGROUP:-$(id -g)}
+
+# Docker Compose files - default and override
+DOCKER_COMPOSE="docker-compose.yml"
+DOCKER_COMPOSE_OVERRIDE="docker-compose.override.yml"
+
+# Determine the project root directory
+if [ -f "./vendor/yourname/codeigniter-raft/bin/raft" ]; then
+    # Script is running from the project directory
+    RAFT_ROOT="./vendor/yourname/codeigniter-raft"
+else
+    # Script is running from the package directory
+    RAFT_ROOT="$(dirname $(dirname $0))"
+fi
+
+# Display banner
+function display_banner {
+    echo -e "${BLUE}"
+    echo -e "${BOLD}   _____          _      ___            _ _           _____       __ _   "
+    echo -e "${BOLD}  / ____|        | |    |_ _|          (_) |         |  __ \\     / _| |  "
+    echo -e "${BOLD} | |     ___   __| | ___ | |_ __   __ _ _| |_ ___ _ __| |__) |__ | |_| |_ "
+    echo -e "${BOLD} | |    / _ \\ / _\` |/ _ \\| | '_ \\ / _\` | | __/ _ \\ '__|  _  / _ \\|  _| __|"
+    echo -e "${BOLD} | |___| (_) | (_| |  __/| | | | | (_| | | ||  __/ |  | | \\ \\ __/ | |_| |_"
+    echo -e "${BOLD}  \\_____\\___/ \\__,_|\\___|___|_| |_|\\__, |_|\\__\\___|_|  |_|  \\_\\___|_|  \\__|"
+    echo -e "${BOLD}                                    __/ |                                 "
+    echo -e "${BOLD}                                   |___/                                  "
+    echo -e "${RESET}"
+}
+
+# Check if Docker is installed and running
+function check_docker {
+    if ! command -v docker &> /dev/null; then
+        echo -e "${RED}Docker is not installed. Please install Docker before using CodeIgniter Raft.${RESET}"
+        exit 1
+    fi
+    
+    if ! docker info &> /dev/null; then
+        echo -e "${RED}Docker is not running. Please start Docker before using CodeIgniter Raft.${RESET}"
+        exit 1
+    fi
+}
+
+# Check if docker-compose is installed
+function check_docker_compose {
+    if ! command -v docker-compose &> /dev/null; then
+        echo -e "${RED}Docker Compose is not installed. Please install Docker Compose before using CodeIgniter Raft.${RESET}"
+        exit 1
+    fi
+}
+
+# Install Raft into a project
+function install {
+    display_banner
+    
+    echo -e "${GREEN}Installing CodeIgniter Raft...${RESET}"
+    
+    # Copy docker-compose files
+    cp "$RAFT_ROOT/docker/$DOCKER_COMPOSE" ./docker-compose.yml
+    
+    if [ -f "$RAFT_ROOT/docker/$DOCKER_COMPOSE_OVERRIDE" ]; then
+        cp "$RAFT_ROOT/docker/$DOCKER_COMPOSE_OVERRIDE" ./docker-compose.override.yml
+    fi
+    
+    # Create .env file if it doesn't exist
+    if [ ! -f .env ]; then
+        cp env .env
+        echo "APP_PORT=$APP_PORT" >> .env
+        echo "DB_PORT=$DB_PORT" >> .env
+        echo "WWWUSER=$WWWUSER" >> .env
+        echo "WWWGROUP=$WWWGROUP" >> .env
+    fi
+    
+    # Create docker directory
+    mkdir -p docker/
+    cp -R "$RAFT_ROOT/docker/config" ./docker/
+    
+    echo -e "${GREEN}CodeIgniter Raft installed successfully!${RESET}"
+    echo -e "${GREEN}Run './vendor/bin/raft up' to start your development environment.${RESET}"
+}
+
+# Start the containers
+function start {
+    check_docker
+    check_docker_compose
+    
+    echo -e "${GREEN}Starting CodeIgniter Raft...${RESET}"
+    docker-compose up -d
+    
+    # Display container info
+    echo -e "${GREEN}CodeIgniter Raft is running!${RESET}"
+    echo -e "${GREEN}Your application is available at http://localhost:$APP_PORT${RESET}"
+}
+
+# Stop the containers
+function stop {
+    check_docker
+    check_docker_compose
+    
+    echo -e "${GREEN}Stopping CodeIgniter Raft...${RESET}"
+    docker-compose down
+    
+    echo -e "${GREEN}CodeIgniter Raft stopped.${RESET}"
+}
+
+# Display help information
+function display_help {
+    display_banner
+    
+    echo -e "CodeIgniter Raft - A Docker-based development environment for CodeIgniter 4"
+    echo -e ""
+    echo -e "Usage:"
+    echo -e "  ${GREEN}./vendor/bin/raft [command]${RESET}"
+    echo -e ""
+    echo -e "Commands:"
+    echo -e "  ${GREEN}install${RESET}         Install Raft into your project"
+    echo -e "  ${GREEN}up${RESET}, ${GREEN}start${RESET}      Start the application containers"
+    echo -e "  ${GREEN}down${RESET}, ${GREEN}stop${RESET}     Stop the application containers"
+    echo -e "  ${GREEN}restart${RESET}         Restart the application containers"
+    echo -e "  ${GREEN}ps${RESET}              Display status of containers"
+    echo -e "  ${GREEN}php${RESET}             Execute a PHP command"
+    echo -e "  ${GREEN}composer${RESET}        Execute a Composer command"
+    echo -e "  ${GREEN}spark${RESET}           Execute a CI4 CLI command (php spark)"
+    echo -e "  ${GREEN}mysql${RESET}           Start a MySQL CLI session"
+    echo -e "  ${GREEN}shell${RESET}           Start a shell session in the application container"
+    echo -e "  ${GREEN}test${RESET}            Run PHPUnit tests"
+    echo -e "  ${GREEN}help${RESET}            Display this help message"
+}
+
+# Execute a PHP command
+function run_php {
+    check_docker
+    check_docker_compose
+    
+    docker-compose exec \
+        -u ${WWWUSER}:${WWWGROUP} \
+        ${APP_SERVICE} \
+        php "$@"
+}
+
+# Execute a Composer command
+function run_composer {
+    check_docker
+    check_docker_compose
+    
+    docker-compose exec \
+        -u ${WWWUSER}:${WWWGROUP} \
+        ${APP_SERVICE} \
+        composer "$@"
+}
+
+# Execute a CodeIgniter CLI command (spark)
+function run_spark {
+    check_docker
+    check_docker_compose
+    
+    docker-compose exec \
+        -u ${WWWUSER}:${WWWGROUP} \
+        ${APP_SERVICE} \
+        php spark "$@"
+}
+
+# Start a MySQL CLI session
+function run_mysql {
+    check_docker
+    check_docker_compose
+    
+    docker-compose exec \
+        mysql \
+        mysql -u root -p"${DB_PASSWORD:-password}" "${DB_DATABASE:-codeigniter}"
+}
+
+# Start a shell session
+function run_shell {
+    check_docker
+    check_docker_compose
+    
+    docker-compose exec \
+        -u ${WWWUSER}:${WWWGROUP} \
+        ${APP_SERVICE} \
+        /bin/bash
+}
+
+# Run PHPUnit tests
+function run_test {
+    check_docker
+    check_docker_compose
+    
+    docker-compose exec \
+        -u ${WWWUSER}:${WWWGROUP} \
+        ${APP_SERVICE} \
+        ./vendor/bin/phpunit "$@"
+}
+
+# Display container status
+function display_status {
+    check_docker
+    check_docker_compose
+    
+    docker-compose ps
+}
+
+# Parse command
+case "$1" in
+    install)
+        install
+        ;;
+    up|start)
+        start
+        ;;
+    down|stop)
+        stop
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    ps)
+        display_status
+        ;;
+    php)
+        shift 1
+        run_php "$@"
+        ;;
+    composer)
+        shift 1
+        run_composer "$@"
+        ;;
+    spark)
+        shift 1
+        run_spark "$@"
+        ;;
+    mysql)
+        run_mysql
+        ;;
+    shell|bash)
+        run_shell
+        ;;
+    test)
+        shift 1
+        run_test "$@"
+        ;;
+    help|-h|--help)
+        display_help
+        ;;
+    *)
+        display_help
+        exit 1
+        ;;
+esac

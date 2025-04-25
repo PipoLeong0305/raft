@@ -1,0 +1,43 @@
+{
+    "name": "pipo/raft",
+    "description": "A Docker-based development environment for CodeIgniter 4",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pipo",
+            "email": "leongpipo0305@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0",
+        "codeigniter4/framework": "^4.0"
+    },
+    "bin": [
+        "bin/raft"
+    ],
+    "autoload": {
+        "psr-4": {
+            "Raft\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "post-install-cmd": [
+            "Raft\\ComposerScripts::postInstall"
+        ],
+        "post-update-cmd": [
+            "Raft\\ComposerScripts::postUpdate"
+        ]
+    },
+    "extra": {
+        "raft": {
+            "services": [
+                "mysql",
+                "redis",
+                "mailhog"
+            ]
+        }
+    }
+}
