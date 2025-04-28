@@ -60,7 +60,9 @@ RUN mkdir -p /var/www/html/writable && \
 
 # Configure PHP-FPM to run as raft user
 RUN sed -i "s/user = www-data/user = raft/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/group = www-data/group = raft/g" /usr/local/etc/php-fpm.d/www.conf
+    sed -i "s/group = www-data/group = raft/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/listen.owner = www-data/listen.owner = raft/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/listen.group = www-data/listen.group = raft/g" /usr/local/etc/php-fpm.d/www.conf
 
 # Copy the PHP configuration
 COPY php.ini /usr/local/etc/php/conf.d/raft.ini
@@ -68,5 +70,8 @@ COPY php.ini /usr/local/etc/php/conf.d/raft.ini
 # Set up entrypoint
 COPY start-container.sh /usr/local/bin/start-container
 RUN chmod +x /usr/local/bin/start-container
+
+# Set proper ownership for Apache directories
+RUN chown -R raft:raft /var/run/apache2 /var/lock/apache2 /var/log/apache2
 
 ENTRYPOINT ["start-container"]
