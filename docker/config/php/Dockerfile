@@ -16,7 +16,13 @@ RUN apt-get update && apt-get install -y \
     sudo \
     apache2 \
     libapache2-mod-fcgid \
-    nano
+    nano \
+    gnupg
+
+# Install Node.js, npm and Yarn
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g yarn
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*

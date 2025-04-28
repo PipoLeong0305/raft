@@ -5,6 +5,11 @@ if [ "$(id -u)" = "0" ]; then
   chmod -R 775 /var/run/apache2 /var/lock/apache2 /var/log/apache2
   chown -R raft:raft /var/run/apache2 /var/lock/apache2 /var/log/apache2 /var/www/html
   
+  # Print Node.js, npm, and Yarn versions
+  echo "Node.js version: $(node -v)"
+  echo "npm version: $(npm -v)"
+  echo "Yarn version: $(yarn -v)"
+  
   # Start PHP-FPM
   php-fpm -D
   
