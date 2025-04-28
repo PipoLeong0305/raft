@@ -1,4 +1,4 @@
-FROM php:8.2-apache
+FROM php:8.2-fpm
 
 ARG WWWGROUP=1000
 ARG WWWUSER=1000
@@ -13,7 +13,10 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
-    sudo
+    sudo \
+    apache2 \
+    libapache2-mod-fcgid \
+    nano
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -22,13 +25,13 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
 
 # Configure Apache
-RUN a2enmod rewrite
+RUN a2enmod rewrite proxy_fcgi setenvif
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Configure Apache document root
-RUN sed -i 's/DocumentRoot \/var\/www\/html/DocumentRoot \/var\/www\/html\/public/g' /etc/apache2/sites-available/000-default.conf
+# Configure Apache for PHP-FPM
+COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -47,12 +50,17 @@ RUN usermod -u $WWWUSER raft && \
     groupmod -g $WWWGROUP raft
 
 # Set up Apache to run as the proper user
-RUN sed -i "s/export APACHE_RUN_USER=raft/export APACHE_RUN_USER=raft/g" /etc/apache2/envvars && \
-    sed -i "s/export APACHE_RUN_GROUP=raft/export APACHE_RUN_GROUP=raft/g" /etc/apache2/envvars
+RUN sed -i "s/export APACHE_RUN_USER=www-data/export APACHE_RUN_USER=raft/g" /etc/apache2/envvars && \
+    sed -i "s/export APACHE_RUN_GROUP=www-data/export APACHE_RUN_GROUP=raft/g" /etc/apache2/envvars
 
 # Ensure writable directory permissions for raft user
-RUN chown -R raft:raft /var/www/html/writable && \
+RUN mkdir -p /var/www/html/writable && \
+    chown -R raft:raft /var/www/html/writable && \
     chmod -R 775 /var/www/html/writable
+
+# Configure PHP-FPM to run as raft user
+RUN sed -i "s/user = www-data/user = raft/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/group = www-data/group = raft/g" /usr/local/etc/php-fpm.d/www.conf
 
 # Copy the PHP configuration
 COPY php.ini /usr/local/etc/php/conf.d/raft.ini
