@@ -141,6 +141,7 @@ function display_help {
     echo -e "  ${GREEN}mysql${RESET}           Start a MySQL CLI session"
     echo -e "  ${GREEN}shell${RESET}           Start a shell session in the application container"
     echo -e "  ${GREEN}test${RESET}            Run PHPUnit tests"
+    echo -e "  ${GREEN}docker build${RESET}    Build the Docker image for the application"
     echo -e "  ${GREEN}help${RESET}            Display this help message"
 }
 
@@ -256,6 +257,18 @@ case "$1" in
     test)
         shift 1
         run_test "$@"
+        ;;
+    docker)
+        if [ "$2" = "build" ]; then
+            check_docker
+            check_docker_compose
+            echo -e "${GREEN}Building Docker image...${RESET}"
+            docker build -f docker/config/php/Dockerfile -t raft-app .
+        else
+            echo -e "${RED}Unknown docker subcommand: $2${RESET}"
+            display_help
+            exit 1
+        fi
         ;;
     help|-h|--help)
         display_help

@@ -34,20 +34,25 @@ RUN sed -i 's/DocumentRoot \/var\/www\/html/DocumentRoot \/var\/www\/html\/publi
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Create system user
-RUN useradd -G www-data,root -u $WWWUSER -d /home/raft raft
+RUN groupadd raft || true && \
+    useradd -g raft -G root -u $WWWUSER -d /home/raft raft
 RUN mkdir -p /home/raft/.composer && \
     chown -R raft:raft /home/raft
 
 # Set up sudo for the raft user
 RUN echo "raft ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/raft
 
-# Allow www-data to have proper permissions
-RUN usermod -u $WWWUSER www-data && \
-    groupmod -g $WWWGROUP www-data
+# Allow raft to have proper permissions
+RUN usermod -u $WWWUSER raft && \
+    groupmod -g $WWWGROUP raft
 
 # Set up Apache to run as the proper user
-RUN sed -i "s/export APACHE_RUN_USER=www-data/export APACHE_RUN_USER=raft/g" /etc/apache2/envvars && \
-    sed -i "s/export APACHE_RUN_GROUP=www-data/export APACHE_RUN_GROUP=raft/g" /etc/apache2/envvars
+RUN sed -i "s/export APACHE_RUN_USER=raft/export APACHE_RUN_USER=raft/g" /etc/apache2/envvars && \
+    sed -i "s/export APACHE_RUN_GROUP=raft/export APACHE_RUN_GROUP=raft/g" /etc/apache2/envvars
+
+# Ensure writable directory permissions for raft user
+RUN chown -R raft:raft /var/www/html/writable && \
+    chmod -R 775 /var/www/html/writable
 
 # Copy the PHP configuration
 COPY php.ini /usr/local/etc/php/conf.d/raft.ini
