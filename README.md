@@ -1,6 +1,6 @@
 # CodeIgniter Raft
 
-A Docker-based development environment for CodeIgniter 4, inspired by Laravel Sail.
+**CodeIgniter Raft** is a lightweight, Docker-powered development environment for CodeIgniter 4 that simplifies local development workflows. Built with PHP-FPM and Apache2, it provides a ready-to-use containerized setup with zero configuration required.
 
 ![CodeIgniter Raft](https://via.placeholder.com/800x200?text=CodeIgniter+Raft)
 
@@ -92,7 +92,7 @@ By default, Raft commands are invoked using the `raft` script that is included w
 However, instead of repeatedly typing `./raft` to execute Raft commands, you may wish to configure a shell alias that allows you to execute Raft's commands more easily:
 
 ```bash
-alias raft='sh $([ -f raft ] && echo ./raft || echo ./raft)'
+alias raft='sh $([ -f raft ] && echo raft || echo vendor/bin/raft)'
 ```
 
 To make sure this is always available, you may add this to your shell configuration file in your home directory, such as `~/.zshrc` or `~/.bashrc`, and then restart your shell.
