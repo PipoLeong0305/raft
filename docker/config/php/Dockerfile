@@ -6,6 +6,7 @@ ARG WWWUSER=1000
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
 
+
 # Install system dependencies and PHP extensions in one layer
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
@@ -67,5 +68,8 @@ RUN sed -i "s/user = www-data/user = raft/g" /usr/local/etc/php-fpm.d/www.conf &
     sed -i "s/listen.group = www-data/listen.group = raft/g" /usr/local/etc/php-fpm.d/www.conf && \
     sed -i "s/export APACHE_RUN_USER=www-data/export APACHE_RUN_USER=raft/g" /etc/apache2/envvars && \
     sed -i "s/export APACHE_RUN_GROUP=www-data/export APACHE_RUN_GROUP=raft/g" /etc/apache2/envvars
+
+# Enable required Apache modules
+RUN a2enmod proxy proxy_fcgi rewrite
 
 ENTRYPOINT ["start-container"]
