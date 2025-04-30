@@ -98,10 +98,6 @@ function install {
         echo "COMPOSER_HOME=$COMPOSER_HOME" >> .env
     fi
     
-    # Create docker directory
-    mkdir -p docker/
-    cp -R "$RAFT_ROOT/docker/config" ./docker/
-    
     echo -e "${GREEN}CodeIgniter Raft installed successfully!${RESET}"
     echo -e "${GREEN}Run './vendor/bin/raft up' to start your development environment.${RESET}"
 }
