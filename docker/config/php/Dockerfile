@@ -41,10 +41,10 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
 WORKDIR /var/www/html
 
 # Copy configuration files
-COPY ./vendor/pipo/raft/docker/config/php/apache-config.conf /etc/apache2/sites-available/000-default.conf
-COPY ./vendor/pipo/raft/docker/config/php/php.ini /usr/local/etc/php/conf.d/raft.ini
-COPY ./vendor/pipo/raft/docker/config/php/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY ./vendor/pipo/raft/docker/config/php/start-container.sh /usr/local/bin/start-container
+COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
+COPY php.ini /usr/local/etc/php/conf.d/raft.ini
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY start-container.sh /usr/local/bin/start-container
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
