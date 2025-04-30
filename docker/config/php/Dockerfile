@@ -3,6 +3,9 @@ FROM php:8.2-fpm
 ARG WWWGROUP=1000
 ARG WWWUSER=1000
 
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
@@ -17,7 +20,14 @@ RUN apt-get update && apt-get install -y \
     apache2 \
     libapache2-mod-fcgid \
     nano \
-    gnupg
+    gnupg \
+    supervisor \
+    libcap2-bin \
+    python3 \
+    dnsutils \
+    librsvg2-bin \
+    fswatch \
+    ffmpeg
 
 # Install Node.js, npm and Yarn
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
@@ -43,32 +53,16 @@ COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Create system user
-RUN groupadd raft || true && \
-    useradd -g raft -G root -u $WWWUSER -d /home/raft raft
-RUN mkdir -p /home/raft/.composer && \
-    chown -R raft:raft /home/raft
+RUN groupadd --force -g $WWWGROUP raft && \
+    useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u $WWWUSER raft
 
 # Set up sudo for the raft user
 RUN echo "raft ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/raft
 
-# Allow raft to have proper permissions
-RUN usermod -u $WWWUSER raft && \
-    groupmod -g $WWWGROUP raft
-
-# Set up Apache to run as the proper user
-RUN sed -i "s/export APACHE_RUN_USER=www-data/export APACHE_RUN_USER=raft/g" /etc/apache2/envvars && \
-    sed -i "s/export APACHE_RUN_GROUP=www-data/export APACHE_RUN_GROUP=raft/g" /etc/apache2/envvars
-
-# Ensure writable directory permissions for raft user
+# Ensure writable directory permissions
 RUN mkdir -p /var/www/html/writable && \
     chown -R raft:raft /var/www/html/writable && \
     chmod -R 775 /var/www/html/writable
-
-# Configure PHP-FPM to run as raft user
-RUN sed -i "s/user = www-data/user = raft/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/group = www-data/group = raft/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/listen.owner = www-data/listen.owner = raft/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/listen.group = www-data/listen.group = raft/g" /usr/local/etc/php-fpm.d/www.conf
 
 # Copy the PHP configuration
 COPY php.ini /usr/local/etc/php/conf.d/raft.ini
@@ -77,7 +71,21 @@ COPY php.ini /usr/local/etc/php/conf.d/raft.ini
 COPY start-container.sh /usr/local/bin/start-container
 RUN chmod +x /usr/local/bin/start-container
 
-# Set proper ownership for Apache directories
-RUN chown -R raft:raft /var/run/apache2 /var/lock/apache2 /var/log/apache2
+# Create Apache directories
+RUN mkdir -p /var/run/apache2 /var/lock/apache2 /var/log/apache2 && \
+    chown -R raft:raft /var/run/apache2 /var/lock/apache2 /var/log/apache2
+
+# Set up supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Set PHP-FPM to run as raft user
+RUN sed -i "s/user = www-data/user = raft/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/group = www-data/group = raft/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/listen.owner = www-data/listen.owner = raft/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/listen.group = www-data/listen.group = raft/g" /usr/local/etc/php-fpm.d/www.conf
+
+# Set up Apache to run as raft user
+RUN sed -i "s/export APACHE_RUN_USER=www-data/export APACHE_RUN_USER=raft/g" /etc/apache2/envvars && \
+    sed -i "s/export APACHE_RUN_GROUP=www-data/export APACHE_RUN_GROUP=raft/g" /etc/apache2/envvars
 
 ENTRYPOINT ["start-container"]

@@ -20,3 +20,19 @@ else
   php-fpm -D
   exec apache2ctl -D FOREGROUND
 fi
+
+if [ ! -z "$WWWUSER" ]; then
+    usermod -u $WWWUSER raft
+fi
+
+if [ ! -d /.composer ]; then
+    mkdir /.composer
+fi
+
+chmod -R ugo+rw /.composer
+
+if [ $# -gt 0 ]; then
+    exec gosu raft "$@"
+else
+    exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+fi

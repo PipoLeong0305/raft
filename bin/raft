@@ -15,8 +15,13 @@ RESET='\033[0m'
 export APP_PORT=${APP_PORT:-80}
 export APP_SERVICE=${APP_SERVICE:-raft-app}
 export DB_PORT=${DB_PORT:-3306}
+export REDIS_PORT=${REDIS_PORT:-6379}
+export MAILHOG_PORT=${MAILHOG_PORT:-1025}
+export MAILHOG_DASHBOARD_PORT=${MAILHOG_DASHBOARD_PORT:-8025}
+export PHPMYADMIN_PORT=${PHPMYADMIN_PORT:-8080}
 export WWWUSER=${WWWUSER:-$UID}
 export WWWGROUP=${WWWGROUP:-$(id -g)}
+export COMPOSER_HOME=${COMPOSER_HOME:-$HOME/.composer}
 
 # Docker Compose files - default and override
 DOCKER_COMPOSE="docker-compose.yml"
@@ -84,8 +89,13 @@ function install {
         cp env .env
         echo "APP_PORT=$APP_PORT" >> .env
         echo "DB_PORT=$DB_PORT" >> .env
+        echo "REDIS_PORT=$REDIS_PORT" >> .env
+        echo "MAILHOG_PORT=$MAILHOG_PORT" >> .env
+        echo "MAILHOG_DASHBOARD_PORT=$MAILHOG_DASHBOARD_PORT" >> .env
+        echo "PHPMYADMIN_PORT=$PHPMYADMIN_PORT" >> .env
         echo "WWWUSER=$WWWUSER" >> .env
         echo "WWWGROUP=$WWWGROUP" >> .env
+        echo "COMPOSER_HOME=$COMPOSER_HOME" >> .env
     fi
     
     # Create docker directory
@@ -104,9 +114,15 @@ function start {
     echo -e "${GREEN}Starting CodeIgniter Raft...${RESET}"
     docker-compose up -d
     
+    # Wait for services to be healthy
+    echo -e "${YELLOW}Waiting for services to be healthy...${RESET}"
+    sleep 5
+    
     # Display container info
     echo -e "${GREEN}CodeIgniter Raft is running!${RESET}"
     echo -e "${GREEN}Your application is available at http://localhost:$APP_PORT${RESET}"
+    echo -e "${GREEN}MailHog is available at http://localhost:$MAILHOG_DASHBOARD_PORT${RESET}"
+    echo -e "${GREEN}phpMyAdmin is available at http://localhost:$PHPMYADMIN_PORT${RESET}"
 }
 
 # Stop the containers
@@ -139,9 +155,11 @@ function display_help {
     echo -e "  ${GREEN}composer${RESET}        Execute a Composer command"
     echo -e "  ${GREEN}spark${RESET}           Execute a CI4 CLI command (php spark)"
     echo -e "  ${GREEN}mysql${RESET}           Start a MySQL CLI session"
+    echo -e "  ${GREEN}redis${RESET}           Start a Redis CLI session"
     echo -e "  ${GREEN}shell${RESET}           Start a shell session in the application container"
     echo -e "  ${GREEN}test${RESET}            Run PHPUnit tests"
-    echo -e "  ${GREEN}docker build${RESET}    Build the Docker image for the application"
+    echo -e "  ${GREEN}build${RESET}           Build the Docker image for the application"
+    echo -e "  ${GREEN}build --no-cache${RESET} Build the Docker image without using cache"
     echo -e "  ${GREEN}help${RESET}            Display this help message"
 }
 
@@ -186,6 +204,14 @@ function run_mysql {
     docker-compose exec \
         mysql \
         mysql -u root -p"${DB_PASSWORD:-password}" "${DB_DATABASE:-codeigniter}"
+}
+
+# Start a Redis CLI session
+function run_redis {
+    check_docker
+    check_docker_compose
+    
+    docker-compose exec redis redis-cli
 }
 
 # Start a shell session
@@ -251,6 +277,9 @@ case "$1" in
     mysql)
         run_mysql
         ;;
+    redis)
+        run_redis
+        ;;
     shell|bash)
         run_shell
         ;;
@@ -258,16 +287,14 @@ case "$1" in
         shift 1
         run_test "$@"
         ;;
-    docker)
-        if [ "$2" = "build" ]; then
-            check_docker
-            check_docker_compose
-            echo -e "${GREEN}Building Docker image...${RESET}"
-            docker build -f docker/config/php/Dockerfile -t raft-app .
+    build)
+        check_docker
+        check_docker_compose
+        echo -e "${GREEN}Building Docker image...${RESET}"
+        if [ "$2" = "--no-cache" ]; then
+            docker build --no-cache -f docker/config/php/Dockerfile -t raft-app .
         else
-            echo -e "${RED}Unknown docker subcommand: $2${RESET}"
-            display_help
-            exit 1
+            docker build -f docker/config/php/Dockerfile -t raft-app .
         fi
         ;;
     help|-h|--help)
