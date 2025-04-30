@@ -47,7 +47,7 @@ RUN a2enmod rewrite proxy_fcgi setenvif
 WORKDIR /var/www/html
 
 # Configure Apache for PHP-FPM
-COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
+COPY docker/config/php/apache-config.conf /etc/apache2/sites-available/000-default.conf
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -65,10 +65,10 @@ RUN mkdir -p /var/www/html/writable && \
     chmod -R 775 /var/www/html/writable
 
 # Copy the PHP configuration
-COPY php.ini /usr/local/etc/php/conf.d/raft.ini
+COPY docker/config/php/php.ini /usr/local/etc/php/conf.d/raft.ini
 
 # Set up entrypoint
-COPY start-container.sh /usr/local/bin/start-container
+COPY docker/config/php/start-container.sh /usr/local/bin/start-container
 RUN chmod +x /usr/local/bin/start-container
 
 # Create Apache directories
@@ -76,7 +76,7 @@ RUN mkdir -p /var/run/apache2 /var/lock/apache2 /var/log/apache2 && \
     chown -R raft:raft /var/run/apache2 /var/lock/apache2 /var/log/apache2
 
 # Set up supervisor
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/config/php/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Set PHP-FPM to run as raft user
 RUN sed -i "s/user = www-data/user = raft/g" /usr/local/etc/php-fpm.d/www.conf && \
