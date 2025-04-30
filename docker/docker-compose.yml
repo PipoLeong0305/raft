@@ -25,7 +25,6 @@ services:
     depends_on:
       - mysql
       - redis
-    user: "${WWWUSER}:${WWWGROUP}"
     healthcheck:
       test: ["CMD", "php", "artisan", "--version"]
       retries: 3
