@@ -288,9 +288,9 @@ case "$1" in
         check_docker_compose
         echo -e "${GREEN}Building Docker image...${RESET}"
         if [ "$2" = "--no-cache" ]; then
-            docker build --no-cache -f docker/config/php/Dockerfile -t raft-app .
+            docker build --no-cache -f ./vendor/pipo/raft/docker/config/php/Dockerfile -t raft-app .
         else
-            docker build -f docker/config/php/Dockerfile -t raft-app .
+            docker build -f ./vendor/pipo/raft/docker/config/php/Dockerfile -t raft-app .
         fi
         ;;
     help|-h|--help)
