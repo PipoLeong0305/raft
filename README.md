@@ -13,7 +13,7 @@ CodeIgniter Raft provides a Docker-powered local development experience for Code
 You can install CodeIgniter Raft as a development dependency in your CodeIgniter project:
 
 ```bash
-composer require --dev yourname/codeigniter-raft
+composer require pipo/raft
 ```
 
 After installing CodeIgniter Raft, run the following command to set up the Raft configuration files in your project:
@@ -81,11 +81,33 @@ You can execute commands inside the application container using the `raft` scrip
 ./raft shell
 ```
 
+### Configuring A Shell Alias
+
+By default, Raft commands are invoked using the `raft` script that is included with your project:
+
+```bash
+./raft up
+```
+
+However, instead of repeatedly typing `./raft` to execute Raft commands, you may wish to configure a shell alias that allows you to execute Raft's commands more easily:
+
+```bash
+alias raft='sh $([ -f raft ] && echo ./raft || echo ./raft)'
+```
+
+To make sure this is always available, you may add this to your shell configuration file in your home directory, such as `~/.zshrc` or `~/.bashrc`, and then restart your shell.
+
+Once the shell alias has been configured, you may execute Raft commands by simply typing `raft`. The remainder of this documentation's examples will assume that you have configured this alias:
+
+```bash
+raft up
+```
+
 ## Available Services
 
 By default, Raft includes the following services:
 
-- **raft-app**: The CodeIgniter application with PHP 8.1 and Apache
+- **raft-app**: The CodeIgniter application with PHP 8.2 and Apache
 - **mysql**: MySQL 8.0 database
 - **redis**: Redis server
 - **mailhog**: MailHog for testing emails
